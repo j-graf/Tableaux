@@ -44,6 +44,12 @@ Macaulay2 package for constructing (skew) Young tableaux.
     - `isSemistandard` ✅
     - `isStandard` ✅
     - `isRowStrict` and `isColumnStrict` ✅
+  - Random tableaux: `randomSemistandardTableau`, `randomStandardTableau`, and `randomTabloid` ✅
+  - Useful partition methods
+    - `allSubPartitions`
+    - `isNonnegative`
+    - `isWeaklyDecreasing`
+  - Concatenating nets: `horizonalNet` and `verticalNet`
 - Bug fixes/changes
   
 
