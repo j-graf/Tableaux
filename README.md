@@ -41,6 +41,7 @@ Macaulay2 package for constructing (skew) Young tableaux.
     - `rowPermutationTableaux`
     - `tableauToList`
 - More features
+  - Updated `net`, so that any filling can be drawn properly (e.g., if the entries are tableaux themselves) ✅
   - Subclass `Tabloid` ✅
   - Export method `isSkew` ✅
   - Export methods `outerShape` and `innerShape` ✅
