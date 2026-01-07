@@ -13,6 +13,7 @@ Macaulay2 package for constructing (skew) Young tableaux.
   - Charge, ...
   - RSK, ...
 - Option to choose English or French diagrams
+- Handle conjugates of compositions
 
 # Changelog
 
