@@ -20,7 +20,7 @@ Macaulay2 package for constructing (skew) Young tableaux.
   - Remove subclass `YoungTableau`, and rename `SkewTableau` to `YoungTableau` ✅
   - Rename `truncate` to `trim` (c.f. package `Permutations`) ✅
 - Feature match `SpechtModule`
-  - Class `MutableYoungTableau` ✅
+  - Subclass `MutableYoungTableau` ✅
   - Algorithms
     - `allStandardTableaux` ✅
     - `numStandardTableaux`/`hookLength` ✅
@@ -30,7 +30,7 @@ Macaulay2 package for constructing (skew) Young tableaux.
     - `rowStabilizer` ✅
     - `columnStabilizer` ✅
     - `readingWord` ✅
-  - Note: will not impliment
+  - Note: will not impliment (at lease for now)
     - `TableauList`
       - `addTableau`
       - `toListOfTableaux`
@@ -48,7 +48,10 @@ Macaulay2 package for constructing (skew) Young tableaux.
     - `isSemistandard` ✅
     - `isStandard` ✅
     - `isRowStrict` and `isColumnStrict` ✅
-  - Random tableaux: `randomSemistandardTableau`, `randomStandardTableau`, and `randomTabloid` ✅
+  - Random tableaux
+    - `randomSemistandardTableau` ✅
+    - `randomStandardTableau` ✅
+    - `randomTabloid` ✅
   - Useful partition methods
     - `allSubPartitions` ✅
     - `isNonnegative` ✅
