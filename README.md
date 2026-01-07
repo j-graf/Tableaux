@@ -10,6 +10,8 @@ Macaulay2 package for constructing (skew) Young tableaux.
     - `allTabloids`
   - Implement algorithms in C++ via package `ForeignFunctions`?
 - Implement commonly-used tableaux statistics and algorithms
+  - Charge, ...
+  - RSK, ...
 - Option to choose English or French diagrams
 
 # Changelog
