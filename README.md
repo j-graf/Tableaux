@@ -9,8 +9,8 @@ Macaulay2 package for constructing (skew) Young tableaux.
     - `allStandardTableaux`
     - `allTabloids`
   - Implement algorithms in C++ via package `ForeignFunctions`?
-- Implement commonly-used tableaux statistics
-- Option to use English vs French diagrams
+- Implement commonly-used tableaux statistics and algorithms
+- Option to choose English or French diagrams
 
 # Changelog
 
