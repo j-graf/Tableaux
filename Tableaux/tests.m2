@@ -45,11 +45,6 @@ TEST /// -- mutableYoungTableau, tabloid
  
 ///
 
-TEST /// -- 
- 
-
-///
-
 TEST /// -- numRows, numColumns, rowRange, columnRange, positionList, toIndex, toPosition
          -- T^i, T_j, T_(i,j), rowEntries, columnEntries
 
@@ -58,7 +53,7 @@ TEST /// -- numRows, numColumns, rowRange, columnRange, positionList, toIndex, t
   entryList = toList(1..20)
   T = youngTableau(lam,mu,entryList)
 
-  assert(numRows T == max(# truncate lam, # truncate mu))
+  assert(numRows T == max(# trim lam, # trim mu))
   assert(numColumns T == max(toList lam | toList mu) - min(toList lam | toList mu))
   assert(rowRange T == (0..(numRows T - 1)))
   assert(columnRange T == (min(toList lam | toList mu)..(max(toList lam | toList mu)-1)))
