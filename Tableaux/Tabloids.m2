@@ -45,6 +45,6 @@ toList Tabloid := T -> (
     )
 
 representative = method(TypicalValue => Tabloid)
-representative Tabloid := T -> tabloid(skewShape T, flatten for i from 0 to numRows T - 1 list sort rowEntries(T,i))
+representative Tabloid := T -> youngTableau(skewShape T, flatten for i from 0 to numRows T - 1 list sort rowEntries(T,i))
 
-Tabloid == Tabloid := (T1,T2) -> youngTableau representative T1 == youngTableau representative T2
+Tabloid == Tabloid := (T1,T2) -> representative T1 == representative T2

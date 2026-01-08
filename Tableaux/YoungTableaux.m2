@@ -36,6 +36,8 @@ youngTableau Partition := lam -> (
     youngTableau(lam, new Partition from {}, toList(numBoxesNeeded:""))
     )
 
+-- computing tableau shapes
+
 skewShape = method(TypicalValue => Sequence)
 skewShape YoungTableau := T -> (
     (T#"outerShape", T#"innerShape")
@@ -53,7 +55,7 @@ innerShape YoungTableau := T -> (
 
 shape = method(TypicalValue => Partition)
 shape YoungTableau := T -> (
-    if isSkew then error "expected a non-skew tableau";
+    if isSkew T then error "expected a non-skew tableau";
 
     outerShape T
     )
@@ -65,9 +67,9 @@ trim Partition := Partition => o -> lam -> (
 
     new Partition from lamShortened
     )
-
 trim (Partition,Partition) := (Partition,Partition) => o -> (lam,mu) -> (trim lam, trim mu)
 
+-*
 truncate Partition := theInput -> (
     lam := theInput#1;
     numTrailingZeros := # for i from 1 to #lam list (if lam#-i == 0 then 1 else break);
@@ -82,6 +84,7 @@ truncate (Partition,Partition) := theInput -> (
 
     (truncate lam, truncate mu)
     )
+*-
 
 pad (Partition,Partition) := (lam,mu) -> (
     maxLength := max(#lam,#mu);
@@ -93,7 +96,12 @@ pad (Partition,Partition) := (lam,mu) -> (
     )
 
 standardize = method(TypicalValue => Sequence)
-standardize (Partition,Partition) := (lam,mu) -> pad trim (lam,mu)
+standardize (Partition,Partition) := (lam,mu) -> (
+    (lam,mu) = pad trim (lam,mu);
+    if #lam == 0 then return (new Partition from {0}, new Partition from {0});
+
+    (lam,mu)
+    )
 
 alignToZero = method(TypicalValue => YoungTableau)
 alignToZero (Partition,Partition) := (lam,mu) -> (
@@ -298,8 +306,11 @@ net YoungTableau := T -> (
     innerShapeString := if isDrawnInner then "■" else " ";
 
     (muSmallest, lamLargest) := (min(min toList mu,0), max(max toList lam,0));
-    colWidth := if #entries T == 0 then 1 else max for theBox in entries T list #toString(theBox);
+    --colWidth := if #entries T == 0 then 1 else max for theBox in entries T list #toString(theBox);
+    colWidth := if #entries T == 0 then 1 else max for theBox in entries T list width net theBox;
     colWidth = max {colWidth + 2,3};
+    rowHeight := if #entries T == 0 then 1 else max for theBox in entries T list (depth net theBox + height net theBox);
+    rowHeight = max {rowHeight,1};
     hasNegativeParts := any(toList(lam)|toList(mu), thePart -> thePart < 0);
     
     boxColumns := for colIndex from muSmallest to lamLargest-1 list (
@@ -309,13 +320,20 @@ net YoungTableau := T -> (
             isBoxBelow := rowIndex < #lam-1 and colIndex >= mu#(rowIndex+1) and colIndex < lam#(rowIndex+1);
 
             boxString := if isBox then (
-                boxPadding := if isNegativeRow#rowIndex then "░" else " ";
-                boxEntry := toString((rowEntries(rowIndex,T))#(colIndex-mu#rowIndex));
+                boxEntry := net((rowEntries(rowIndex,T))#(colIndex-mu#rowIndex));
+                
+                boxPadding := if isNegativeRow#rowIndex then "░" else " "; --w
+                boxPadding = (verticalNet for i from 1 to rowHeight list boxPadding)^(height boxEntry - 1);
+                
                 if isNegativeRow#rowIndex and #boxEntry == 0 then boxEntry = "░";
                 boxPadding|boxEntry|boxPadding
+                
                 ) else if (colIndex < 0 and colIndex >= lam#rowIndex) or (colIndex >= 0 and colIndex < mu#rowIndex) then (
-                " "|concatenate((colWidth-2):innerShapeString)|" "
+                aString := " "|concatenate((colWidth-2):innerShapeString)|" ";
+                verticalNet for i from 1 to rowHeight list aString
+                
                 ) else (
+                --verticalNet for i from 1 to rowHeight list(" ")
                 " "
                 );
 
@@ -403,6 +421,7 @@ net YoungTableau := T -> (
                 ) else (
                 " "
                 );
+            boxString = verticalNet for i from 1 to rowHeight list boxString;
 
             belowString := if colIndex == 0 and hasNegativeParts then (
                 "║"
@@ -471,6 +490,24 @@ ferrersDiagram (Partition,Partition) := (lam,mu) -> (
 ferrersDiagram Partition := lam -> ferrersDiagram(lam,new Partition from {0})
 ferrersDiagram YoungTableau := T -> ferrersDiagram standardize skewShape T
 
+verticalNet = theTuple -> (
+    ans := net theTuple#0;
+    for i from 1 to #theTuple-1 do (
+        ans = ans || net theTuple#i;
+        );
+
+    ans
+    )
+
+horizontalNet = theTuple -> (
+    ans := net theTuple#0;
+    for i from 1 to #theTuple-1 do (
+        ans = ans | net theTuple#i;
+        );
+
+    ans
+    )
+
 -- getting data
 
 tex YoungTableau := T -> (
@@ -479,8 +516,12 @@ tex YoungTableau := T -> (
     
     isNegativeRow := listNegativeRows T;
     starString := if hasNegativeRow T then ", star style={fill=red!50}" else "";
-    
-    ans := "\\SkewTableau[skew border, skew boxes"|starString|"] "|toString(toList mu);
+
+    ans := if instance(T, Tabloid) then (
+        "\\Tabloid[skew="|toString(toList mu)|starString|"]"
+        ) else (
+        "\\SkewTableau[skew border, skew boxes"|starString|"]"|toString(toList mu)
+        );
     filling := for i from 0 to #lam-1 list (
         currRow := rowEntries(i,T);
         isRed := isNegativeRow#i;
@@ -539,17 +580,18 @@ components YoungTableau := T -> (
 applyEntries = method(TypicalValue => YoungTableau)
 applyEntries (YoungTableau,Function) := (T,f) -> (
     if not instance(T,Tabloid) then (
-        youngTableau(truncate skewShape T, apply(entries T, f))
+        youngTableau(trim skewShape T, apply(entries T, f))
         ) else (
-        tabloid(truncate skewShape T, apply(entries T, f))
+        tabloid(trim skewShape T, apply(entries T, f))
         )
     )
+
 applyPositions = method(TypicalValue => YoungTableau)
 applyPositions (YoungTableau,Function) := (T,f) -> (
     if not instance(T,Tabloid) then (
-        youngTableau(truncate skewShape T, apply(positionList T, f))
+        youngTableau(trim skewShape T, apply(positionList T, f))
         ) else (
-        tabloid(truncate skewShape T, apply(positionList T, f))
+        tabloid(trim skewShape T, apply(positionList T, f))
         )
     )
 
@@ -570,7 +612,7 @@ verticalConcatenate = method(TypicalValue => YoungTableau)
 verticalConcatenate List := tabList -> (
     lam := new Partition from flatten for T in tabList list toList((standardize skewShape T)#0);
     mu := new Partition from flatten for T in tabList list toList((standardize skewShape T)#1);
-    entryList := flatten for T in tabList list entries T;
+    entryList := flatten for T in tabList list toList entries T;
 
     youngTableau(lam, mu, entryList)
     )
@@ -638,7 +680,7 @@ isNonnegative YoungTableau := T -> isNonnegative standardize skewShape T
 
 isSkew = method(TypicalValue => Boolean)
 isSkew YoungTableau := T -> (
-    (lam,mu) := truncate skewShape T;
+    (lam,mu) := trim skewShape T;
 
     #mu != 0
     )
@@ -751,7 +793,6 @@ readingWord YoungTableau := T -> (
     flatten for colIndex in columnRange T list reverse columnEntries(T,colIndex)
     )
 
-
 -- operators
 
 YoungTableau == YoungTableau := (T1,T2) -> (
@@ -760,6 +801,5 @@ YoungTableau == YoungTableau := (T1,T2) -> (
 
     toList lam1 == toList lam2 and toList mu1 == toList mu2 and entries T1 == entries T2
     )
-
 
 Permutation * YoungTableau := (p,T) -> applyEntries(T, theBox -> (if theBox > #p then theBox else p#(theBox-1)))
