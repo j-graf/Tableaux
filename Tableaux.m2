@@ -1,7 +1,7 @@
 newPackage(
     "Tableaux",
-    Version => "0.5",
-    Date => "July 22, 2025",
+    Version => "0.6",
+    Date => "January 8, 2026",
     Authors => {
 	{Name => "John Graf", Email => "jrgraf@udel.edu", HomePage => "https://j-graf.github.io/"}},
     Headline => "constructing Young tableaux",
@@ -13,13 +13,13 @@ newPackage(
     )
 
 export {"YoungTableau", "youngTableau",
-        "youngDiagram", "ferrersDiagram", "drawInnerShape",
+        "youngDiagram", "ferrersDiagram", "drawInnerShape", "verticalNet", "horizontalNet",
         "skewShape", "shape", "outerShape", "innerShape",
         "standardize", "rowEntries", "columnEntries", "rowRange", "columnRange",
         "isSkew", "isWeaklyDecreasing", "isNonnegative", "isStandard", "isSemistandard",
         "toPosition", "toIndex", "positionList", "applyEntries", "applyPositions",
         "verticalConcatenate", "shift", "unshift",
-        "boxContent", "hookLength", "isDrawnInner", "rowStabilizer", "columnStabilizer", "isCorner",
+        "boxContent", "hookLength", "rowStabilizer", "columnStabilizer", "isCorner",
         "readingWord"
         }
 
@@ -28,9 +28,10 @@ export {"MutableYoungTableau", "mutableYoungTableau"}
 export {"Tabloid", "tabloid",
         "representative"}
 
-export {"allSemistandardTableaux", "numSemistandardTableaux",
-        "allStandardTableaux", "numStandardTableaux",
-        "allTabloids", "numTabloids"}
+export {"allSemistandardTableaux", "numSemistandardTableaux", "randomSemistandardTableau",
+        "allStandardTableaux", "numStandardTableaux", "randomStandardTableau",
+        "allTabloids", "numTabloids", "randomTabloid",
+        "allSubPartitions"}
 
 
     
