@@ -54,7 +54,7 @@ Macaulay2 package for constructing (skew) Young tableaux.
     - `randomSemistandardTableau` ✅
     - `randomStandardTableau` ✅
     - `randomTabloid` ✅
-  - Added `toPartitionSequence` ✅
+  - Added `toPartitionChain` ✅
   - Useful partition methods
     - `allSubPartitions` ✅
     - `isNonnegative` ✅
