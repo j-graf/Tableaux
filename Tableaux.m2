@@ -31,7 +31,7 @@ export {"Tabloid", "tabloid",
 export {"allSemistandardTableaux", "numSemistandardTableaux", "randomSemistandardTableau",
         "allStandardTableaux", "numStandardTableaux", "randomStandardTableau",
         "allTabloids", "numTabloids", "randomTabloid",
-        "allSubPartitions"}
+        "allSubPartitions", "toPartitionChain"}
 
 
     
