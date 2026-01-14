@@ -5,9 +5,23 @@ Macaulay2 package for constructing (skew) Young tableaux.
 
 - Optimization
   - Caching common functions
+  - Algorithm performance improvements
+    - `allStandardTableaux`
+    - `allTabloids`
   - Implement algorithms in C++ via package `ForeignFunctions`?
+- Implement commonly-used tableaux statistics and algorithms
+  - Charge, ...
+  - RSK, ...
+- Option to choose English or French diagrams
+- Handle conjugates of compositions
+
+# Changelog
+
+- Refactor code
+  - Remove subclass `YoungTableau`, and rename `SkewTableau` to `YoungTableau` ✅
+  - Rename `truncate` to `trim` (c.f. package `Permutations`) ✅
 - Feature match `SpechtModule`
-  - Class `MutableYoungTableau` ✅
+  - Subclass `MutableYoungTableau` ✅
   - Algorithms
     - `allStandardTableaux` ✅
     - `numStandardTableaux`/`hookLength` ✅
@@ -16,20 +30,38 @@ Macaulay2 package for constructing (skew) Young tableaux.
   - Statistics
     - `rowStabilizer` ✅
     - `columnStabilizer` ✅
-    - `firstRowDescent` (leave for `SpechtModule`)
     - `readingWord` ✅
+  - Note: will not impliment (at lease for now)
+    - `TableauList`
+      - `addTableau`
+      - `toListOfTableaux`
+    - `firstRowDescent`
+    - `indexTableau`
+    - `listToTableau`
+    - `rowPermutationTableaux`
+    - `tableauToList`
 - More features
+  - Updated `net`, so that any filling can be drawn properly (e.g., if the entries are tableaux themselves) ✅
   - Subclass `Tabloid` ✅
-  - Remove subclass `YoungTableau`, and rename `SkewTableau` to `YoungTableau` ✅
-    - Export method `isSkew` ✅
-    - Export methods `outerShape` and `innerShape` ✅
-    - Export method `shape` as alias for `outerShape`, raise error if `isSkew` ✅
+  - Export method `isSkew` ✅
+  - Export methods `outerShape` and `innerShape` ✅
+  - Export method `shape` as alias for `outerShape`, raise error if `isSkew` ✅
   - More Booleans
     - `isSemistandard` ✅
     - `isStandard` ✅
     - `isRowStrict` and `isColumnStrict` ✅
+  - Random tableaux
+    - `randomSemistandardTableau` ✅
+    - `randomStandardTableau` ✅
+    - `randomTabloid` ✅
+  - Added `toPartitionChain` ✅
+  - Useful partition methods
+    - `allSubPartitions` ✅
+    - `isNonnegative` ✅
+    - `isWeaklyDecreasing` ✅
+  - Concatenating nets: `horizonalNet` and `verticalNet` ✅
 - Bug fixes/changes
-  - Rename `truncate` to `trim` (c.f. package `Permutations`)
+  
 
 # Examples
 
