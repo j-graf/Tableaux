@@ -8,7 +8,8 @@ Node
   Description
     Text
       This package provides the classes @TO YoungTableau@, @TO MutableYoungTableau@, and @TO Tabloid@. These classes
-      can be used to construct (skew) tableaux, and entries in the boxes may be any class.
+      can be used to construct (skew) tableaux, and entries in the boxes may be any class. See the constructor's
+      page @TO youngTableau@ for some basics of this class.
 ///
 
 doc ///
@@ -18,7 +19,7 @@ Headline
     a type of HashTable representing a Young tableau, with mutable entries
 Description
   Text
-    An object of type YoungTableau is a hash table containing two shapes of type @TO Partition@,
+    An object of type MutableYoungTableau is a hash table containing two shapes of type @TO Partition@,
     and a mutable list of box entries. The entries may have any type, except for @TO null@ objects.
 
     The inner and outer shapes, $\lambda$ and $\mu$ respectively, can be any sequence of integers. In particular,
@@ -42,7 +43,7 @@ Headline
     a type of HashTable representing a Young tabloid
 Description
   Text
-    An object of type Tabloid is a subclass of type YoungTableau. A tabloid represents an equivalence class
+    An object of type Tabloid is a subclass of type @TO YoungTableau@. A tabloid represents an equivalence class
     of Young tableaux, with entries in $\{1,\ldots,n\}$. Two tabloids are equal if they have the same shape,
     and each corresponding row contains the same boxes, up to some permutation. Hence, rows are drawn without
     dividing boxes.
@@ -387,6 +388,41 @@ SeeAlso
 
 doc ///
 Key
+    toPartitionChain
+   (toPartitionChain, YoungTableau)
+Headline
+    decompose a tableau into a chain of partitions
+Usage
+   toPartitionChain T
+Inputs
+    T:YoungTableau
+      a tableau.
+Outputs
+    s:Sequence
+      a sequence of partitions.
+Description
+  Text
+    A (semistandard) Young tableau of shape $\lambda/\mu$ determines (and is determined by) a sequence of
+    partitions $(\lambda^{(0)},\ldots,\lambda^{(r)})$, where
+    $\mu= \lambda^{(0)}\subseteq\lambda^{(1)}\subseteq\cdots\subseteq\lambda^{(r)}=\lambda$.
+  Example
+    lam = new Partition from {6,6,5,3,2,2,2,1}
+    mu = new Partition from {3,1}
+    entryList = {1,1,7,1,3,4,4,8,1,2,4,7,7,2,3,5,3,4,4,5,5,6,8}
+    T = youngTableau(lam,mu,entryList)
+    theDecomp = toPartitionChain T
+  Text
+    This chain has the property that each $\lambda^{(i)}/\lambda^{(i-1)}$ is a horizontal strip.
+  Example
+    drawInnerShape true
+    for i from 1 to #theDecomp-1 do (
+        print(toString(toSequence trim theDecomp#i)|"/"|toString(toSequence trim theDecomp#(i-1))|":");
+        print youngTableau(theDecomp#i,theDecomp#(i-1));
+        )
+///
+
+doc ///
+Key
     drawInnerShape
    (drawInnerShape, Boolean)
 Headline
@@ -720,7 +756,7 @@ Consequences
       None of the entries are null.
 Description
   Text
-    This is the same as type YoungTableau, except that the entries may be changed.
+    This is the same as type @TO YoungTableau@, except that the entries may be changed.
   Example
     T = mutableYoungTableau(new Partition from {4,2,1}, new Partition from {1}, toList(1..6))
     T_(0,2) = 9
@@ -797,7 +833,7 @@ Inputs
       the shape, $\lambda$.
 Outputs
     n:ZZ
-      the number of SSYT of the given shape, and entries in $\{1,\ldots,N\}$, where $N$ is the number of boxes.
+      the number of SYT of the given shape, and entries in $\{1,\ldots,N\}$, where $N$ is the number of boxes.
 Description
   Text
     A bagged list of the tableaux can be created with @TO allStandardTableaux@.
@@ -1504,6 +1540,7 @@ Headline
 Usage
     youngTableau(lam, mu, entryList)
     youngTableau((lam,mu),entryList)
+    youngTableau(lam, entryList)
 Inputs
     lam:Partition
       the outer shape $\lambda$.

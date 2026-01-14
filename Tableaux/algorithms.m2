@@ -308,3 +308,26 @@ allSubPartitions (Partition,Partition) := (lam,mu) -> (
     Bag for theList in ans list trim new Partition from theList
     )
 allSubPartitions Partition := lam -> allSubPartitions(lam,new Partition from {})
+
+toPartitionChain = method(TypicalValue => Sequence)
+toPartitionChain YoungTableau := T -> (
+    (lam,mu) := standardize skewShape T;
+
+    minEntry := min entries T;
+    maxEntry := max entries T;
+
+    ans := {mu};
+    
+    for i from minEntry to maxEntry do (
+        lamPrev := ans#-1;
+        
+        lamNew := new Partition from for rowIndex in rowRange T list (
+            lamPrev#rowIndex + number(rowEntries(T,rowIndex), theBox -> theBox == i)
+            );
+
+        ans = append(ans, lamNew);
+        );
+
+    --apply(ans, trim)
+    toSequence ans
+    )
