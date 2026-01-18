@@ -414,7 +414,7 @@ Description
   Text
     This chain has the property that each $\lambda^{(i)}/\lambda^{(i-1)}$ is a horizontal strip.
   Example
-    drawInnerShape true
+    drawInnerShape true -* no-capture-flag *-
     for i from 1 to #theDecomp-1 do (
         print(toString(toSequence trim theDecomp#i)|"/"|toString(toSequence trim theDecomp#(i-1))|":");
         print youngTableau(theDecomp#i,theDecomp#(i-1));
@@ -442,9 +442,9 @@ Consequences
 Description
   Example
     T = youngTableau(new Partition from {5,4,1}, new Partition from {2,1,1})
-    drawInnerShape true
+    drawInnerShape true -* no-capture-flag *-
     T
-    drawInnerShape false
+    drawInnerShape false -* no-capture-flag *-
     T
 SeeAlso
   youngTableau
@@ -535,7 +535,7 @@ Outputs
       a net of objects in L, stacked horizontally and justified at the top.
 Description
   Text
-    If L is a list of objects $A_1,A_2,\ldots,A_n$, then this concatentates their nets horizontally.
+    If L is a list of objects $A_1,A_2,\ldots,A_n$, then this concatenates their nets horizontally.
   Example
     T1 = youngTableau(new Partition from {6,6,5,3,1}, new Partition from {2,1,1})
     T2 = youngTableau(new Partition from {3,1}, new Partition from {1}, {"a","b","c"})
@@ -1485,7 +1485,7 @@ Outputs
       a net of objects in L, stacked vertically and justified on the left.
 Description
   Text
-    If L is a list of objects $A_1,A_2,\ldots,A_n$, then this concatentates their nets vertically. Note that
+    If L is a list of objects $A_1,A_2,\ldots,A_n$, then this concatenates their nets vertically. Note that
     this concatenates their nets into a single net, whereas @TO verticalConcatenate@ concatenates the
     tableaux themselves into a single tableau.
   Example
@@ -1580,9 +1580,9 @@ Description
     The inner shape may be drawn by calling drawInnerShape.
   Example
     T'' = youngTableau(new Partition from {5,4,-1}, new Partition from {2,4,-3})
-    drawInnerShape true
+    drawInnerShape true -* no-capture-flag *-
     T''
-    drawInnerShape false
+    drawInnerShape false -* no-capture-flag *-
     T''
   Text
     The filling may be of any class (besides @TO null@ objects), including other tableaux!
@@ -1675,7 +1675,7 @@ Description
   Text
     The number of rows is the same as largest part in its shape, minus the smallest part in the shape.
   Example
-    drawInnerShape true
+    drawInnerShape true -* no-capture-flag *-
     T = youngTableau(new Partition from {4,3,1}, new Partition from {1,1,1})
     numColumns T
   Text
@@ -1798,7 +1798,7 @@ Inputs
       a tabloid.
 Outputs
     l:Bag
-      a bagged list of all Young tableaux in the equivelence class T.
+      a bagged list of all Young tableaux in the equivalence class T.
 Description
   Example
     T = tabloid(new Partition from {3,1}, {1,2,3,4})
