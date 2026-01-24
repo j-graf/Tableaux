@@ -4,8 +4,8 @@ YoungTableau = new Type of HashTable
 
 youngTableau = method(TypicalValue => YoungTableau)
 youngTableau (Partition,Partition,List) := (lam,mu,theList) -> (
-    (lam',mu') := standardize (lam,mu);
-    numBoxesNeeded := sum for i from 0 to #lam'-1 list abs(lam'#i-mu'#i);
+    --(lam',mu') := standardize (lam,mu);
+    numBoxesNeeded := numBoxes(lam,mu);--sum for i from 0 to #lam'-1 list abs(lam'#i-mu'#i);
     
     if (numBoxesNeeded != #theList) then error "partition sizes do not match with the length of the list";
     if any(theList, theElt -> theElt === null) then error "filling must not contain null entries";
@@ -35,6 +35,12 @@ youngTableau Partition := lam -> (
     
     youngTableau(lam, new Partition from {}, toList(numBoxesNeeded:""))
     )
+
+numBoxes = method(TypicalValue => ZZ)
+numBoxes (Partition,Partition) := memoize( (lam,mu) -> (
+    (lam',mu') := standardize (lam,mu);
+    numBoxesNeeded := sum for i from 0 to #lam'-1 list abs(lam'#i-mu'#i)
+    ))
 
 -- computing tableau shapes
 
@@ -68,23 +74,6 @@ trim Partition := Partition => o -> lam -> (
     new Partition from lamShortened
     )
 trim (Partition,Partition) := (Partition,Partition) => o -> (lam,mu) -> (trim lam, trim mu)
-
--*
-truncate Partition := theInput -> (
-    lam := theInput#1;
-    numTrailingZeros := # for i from 1 to #lam list (if lam#-i == 0 then 1 else break);
-
-    lamShortened := (toList lam)_(toList(0..(#lam-1-numTrailingZeros)));
-
-    new Partition from lamShortened
-    )
-
-truncate (Partition,Partition) := theInput -> (
-    (lam,mu) := theInput#1;
-
-    (truncate lam, truncate mu)
-    )
-*-
 
 pad (Partition,Partition) := (lam,mu) -> (
     maxLength := max(#lam,#mu);
@@ -209,13 +198,7 @@ YoungTableau^ZZ := (T,rowIndex) -> (
     )
 
 YoungTableau_Sequence := (T,thePosition)->(
-    (rowIndex,colIndex) := thePosition;
-    (lam,mu) := standardize skewShape normalizeNegativeRows T;
-
-    if rowIndex < 0 or rowIndex >= numRows T then error("index "|toString(rowIndex)|" out of range");
-    if colIndex < mu#rowIndex or colIndex >= lam#rowIndex then error "index "|toString(colIndex)|" out of range";
-
-    T^rowIndex#colIndex
+    (entries T)#(toIndex(T,thePosition))
     )
 
 YoungTableau_ZZ := (T,colIndex) -> (
@@ -230,14 +213,23 @@ columnEntries = method(TypicalValue => List)
 columnEntries (ZZ,YoungTableau) := (colIndex,T) -> delete(null,T_colIndex)
 columnEntries (YoungTableau,ZZ) := (T,colIndex) -> columnEntries(colIndex,T)
 
+rowList = method(TypicalValue => List)
+rowList YoungTableau := T -> for i from 0 to numRows T - 1 list rowEntries(T,i)
+
+columnList = method(TypicalValue => List)
+columnList YoungTableau := T -> for i from 0 to numColumns T - 1 list columnEntries(T,i)
+
+-- data indexing
+
 toPosition = method(TypicalValue => Sequence)
-toPosition (ZZ,YoungTableau) := (theIndex,T) -> (
+toPosition (Partition, Partition, ZZ) := memoize( (lam,mu,theIndex) -> (
+    T := youngTableau(lam,mu);
     if theIndex < 0 then (
         theIndex = size T + theIndex;
         );
     if theIndex < 0 or theIndex >= size T then error "index out of range";
 
-    (lam,mu) := standardize skewShape normalizeNegativeRows T;
+    (lam,mu) = standardize skewShape normalizeNegativeRows T;
     
     numBoxesSeen := 0;
     for rowIndex from 0 to numRows T - 1 do (
@@ -246,30 +238,20 @@ toPosition (ZZ,YoungTableau) := (theIndex,T) -> (
             numBoxesSeen = numBoxesSeen + 1;
             );
         );
-    )
-toPosition (YoungTableau,ZZ) := (T,theIndex) -> toPosition(theIndex,T)
-
-toIndex = method(TypicalValue => ZZ)
-toIndex (Sequence,YoungTableau) := (thePosition,T) -> (
-    (rowIndex,colIndex) := thePosition;
-    (lam,mu) := standardize skewShape normalizeNegativeRows T;
-
-    if rowIndex < 0 or rowIndex >= #lam or colIndex < mu#rowIndex or colIndex >= lam#rowIndex then error "index out of range";
-
-    numBoxesSeen := 0;
-    for theRowIndex from 0 to numRows T - 1 do (
-        for theColIndex from mu#theRowIndex to lam#theRowIndex - 1 do (
-            if (theRowIndex,theColIndex) == (rowIndex,colIndex) then return numBoxesSeen;
-            numBoxesSeen = numBoxesSeen + 1;
-            );
-        );
-    )
-toIndex (YoungTableau,Sequence) := (T,thePosition) -> toIndex(thePosition,T)
+    ))
+toPosition (Sequence,ZZ) := (skewShape,theIndex) -> toPosition(skewShape#0,skewShape#1,theIndex)
+toPosition (Partition,ZZ) := (lam,theIndex) -> toPosition(lam,new Partition from {0},theIndex)
+toPosition (YoungTableau,ZZ) := (T,theIndex) -> toPosition(skewShape T, theIndex)
 
 positionList = method(TypicalValue => List)
-positionList YoungTableau := T -> (
-    for i from 0 to size T - 1 list toPosition(i,T)
-    )
+positionList (Partition,Partition) := memoize( (lam,mu) -> (
+    T := youngTableau(lam,mu);
+    for i from 0 to size T - 1 list toPosition(T,i)
+    ))
+positionList Partition := memoize( lam -> positionList(lam,new Partition from {0}))
+positionList YoungTableau := memoize( T -> (
+    positionList skewShape T
+    ))
 positionList (YoungTableau,Function) := (T,f) -> (
     (lam,mu) := standardize skewShape T;
     
@@ -283,11 +265,24 @@ positionList (YoungTableau,Function) := (T,f) -> (
     select(positionList T,f)
     )
 
-rowList = method(TypicalValue => List)
-rowList YoungTableau := T -> for i from 0 to numRows T - 1 list rowEntries(T,i)
+toIndex = method(TypicalValue => ZZ)
+toIndex (Partition,Partition,Sequence) := memoize( (lam,mu,thePosition) -> (
+    (rowIndex,colIndex) := thePosition;
+    (lam,mu) = standardize skewShape normalizeNegativeRows youngTableau (lam,mu);
 
-columnList = method(TypicalValue => List)
-columnList YoungTableau := T -> for i from 0 to numColumns T - 1 list columnEntries(T,i)
+    if rowIndex < 0 or rowIndex >= #lam or colIndex < mu#rowIndex or colIndex >= lam#rowIndex then error "index out of range";
+
+    numBoxesSeen := 0;
+    for theRowIndex from 0 to #lam - 1 do (
+        for theColIndex from mu#theRowIndex to lam#theRowIndex - 1 do (
+            if (theRowIndex,theColIndex) == (rowIndex,colIndex) then return numBoxesSeen;
+            numBoxesSeen = numBoxesSeen + 1;
+            );
+        );
+    ))
+toIndex (Sequence,Sequence) := memoize((skewShape,thePosition) -> toIndex(skewShape#0,skewShape#1,thePosition))
+toIndex (Partition,Sequence) := memoize((lam,thePosition) -> toIndex(lam,new Partition from {0},thePosition))
+toIndex (YoungTableau,Sequence) := memoize((T,thePosition) -> toIndex(skewShape T,thePosition))
 
 -- drawing
 
@@ -603,7 +598,7 @@ conjugate YoungTableau := T -> (
     
     lam' := conjugate lam;
     mu' := conjugate mu;
-    entryList' := flatten for colIndex from 0 to lam#0-1 list columnEntries(colIndex,T);
+    entryList' := if #(entries T) == 0 then entries T else flatten for colIndex from 0 to lam#0-1 list columnEntries(colIndex,T);
 
     youngTableau(lam',mu',entryList')
     )
