@@ -14,7 +14,7 @@ maxSSYT (Partition,Partition) := (lam,mu) -> (
     (lam,mu) = standardize skewShape tempT;
 
     entryList := for entryIndex from 0 to sum toList lam - sum toList mu - 1 list (
-        (i,j) := toPosition(entryIndex,tempT);
+        (i,j) := toPosition(tempT,entryIndex);
         theCol := tempT_j;
         theColAbove := theCol_(toList(0..i));
         #(delete(null,theColAbove))
@@ -29,7 +29,7 @@ minSSYT (Partition,Partition,ZZ) := (lam,mu,maxEntry) -> (
     (lam,mu) = standardize skewShape tempT;
     
     entryList := for entryIndex from 0 to sum toList lam - sum toList mu - 1 list (
-        (i,j) := toPosition(entryIndex,tempT);
+        (i,j) := toPosition(tempT,entryIndex);
         theCol := tempT_j;
         theColBelow := theCol_(toList((i+1)..(#theCol-1)));
         maxEntry - #(delete(null,theColBelow))
@@ -46,13 +46,13 @@ addOneSSYT (YoungTableau,Sequence,Partition,Partition) := (T,thePosition,lam,mu)
     maxRowIndex :=  max select(rowIndex..(#lam-1), i -> lam#i > colIndex and mu#i <= colIndex);
     for currRowIndex from rowIndex to maxRowIndex  do (
         for currColIndex from colIndex to lam#currRowIndex-1 do (
-            theIndex := toIndex((currRowIndex,currColIndex),T);
+            theIndex := toIndex((lam,mu),(currRowIndex,currColIndex));
             
             currBox := entryList#theIndex;
             
             isBoxLeft := currColIndex > mu#currRowIndex;
             leftBox := if isBoxLeft then (
-                leftIndex := toIndex((currRowIndex,currColIndex-1),T);
+                leftIndex := toIndex((lam,mu),(currRowIndex,currColIndex-1));
                 entryList#leftIndex
                 ) else (
                 0
@@ -60,7 +60,7 @@ addOneSSYT (YoungTableau,Sequence,Partition,Partition) := (T,thePosition,lam,mu)
             
             isBoxAbove := currRowIndex >= 1 and currColIndex >= mu#(currRowIndex-1) and currColIndex < lam#(currRowIndex-1);
             aboveBox := if isBoxAbove then (
-                aboveIndex := toIndex((currRowIndex-1,currColIndex),T);
+                aboveIndex := toIndex((lam,mu),(currRowIndex-1,currColIndex));
                 entryList#aboveIndex
                 ) else (
                 0
@@ -95,7 +95,7 @@ allSemistandardTableaux (Partition,Partition,ZZ) := (lam,mu,maxEntry) -> (
     recurse := (anIndex,T) -> (
         canAddOneSSYT := (entries T)#anIndex < (entries minT)#anIndex;
         if canAddOneSSYT then (
-            newT := addOneSSYT(T,toPosition(anIndex,T),lam,mu);
+            newT := addOneSSYT(T,toPosition(T,anIndex),lam,mu);
 
             flatten ({newT} | for i from 1 to -anIndex list recurse(-i,newT))
             ) else (
@@ -103,10 +103,7 @@ allSemistandardTableaux (Partition,Partition,ZZ) := (lam,mu,maxEntry) -> (
             )
         );
 
-    ans := {maxT} | flatten parallelApply(1..(size T), theIndex -> recurse(-theIndex,maxT));
-    --ans := {maxT} | flatten for theIndex from 1 to size T list recurse(-theIndex,maxT);
-
-    Bag ans
+    Bag( {maxT} | flatten parallelApply(1..(size T), theIndex -> recurse(-theIndex,maxT)) )
     )
 allSemistandardTableaux (Partition,Partition) := (lam,mu) -> (
     (lam,mu) = standardize (lam,mu);
@@ -190,8 +187,9 @@ numStandardTableaux Partition := lam -> hookLength lam
 allStandardTableaux = method(TypicalValue => Bag)
 allStandardTableaux (Partition) := lam -> (
     lam = trim lam;
+    zeroPartition := new Partition from {0};
     n := sum toList lam;
-    T := youngTableau lam;
+    --T := youngTableau lam;
 
     recurse := (indexList,mu) -> (
         if # mu == 0 then (
@@ -199,7 +197,7 @@ allStandardTableaux (Partition) := lam -> (
             return youngTableau(lam,entryList);
             );
 
-        cornerList := positionList(youngTableau mu,isCorner);
+        cornerList := positionList(youngTableau mu,isCorner); -- should be optimized
         
         flatten for thePosition in cornerList list (
             (rowIndex,colIndex) := thePosition;
@@ -207,7 +205,7 @@ allStandardTableaux (Partition) := lam -> (
                 if i == rowIndex then mu#i-1 else mu#i
                 );
 
-            recurse(indexList | {toIndex(thePosition,T)}, muNew)
+            recurse(indexList | {toIndex((lam,zeroPartition),thePosition)}, muNew)
             )
         );
 
@@ -236,7 +234,7 @@ randomStandardTableau Partition := lam -> (
             if i == rowIndex then mu#i-1 else mu#i
             );
         
-        toIndex(thePosition,T)
+        toIndex(T,thePosition)
         );
 
     entryList := for i from 0 to #indexList - 1 list (n - position(indexList, theIndex -> theIndex == i));
