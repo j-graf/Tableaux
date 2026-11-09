@@ -4,8 +4,7 @@ YoungTableau = new Type of HashTable
 
 youngTableau = method(TypicalValue => YoungTableau)
 youngTableau (Partition,Partition,List) := (lam,mu,theList) -> (
-    --(lam',mu') := standardize (lam,mu);
-    numBoxesNeeded := numBoxes(lam,mu);--sum for i from 0 to #lam'-1 list abs(lam'#i-mu'#i);
+    numBoxesNeeded := numBoxes(lam,mu);
     
     if (numBoxesNeeded != #theList) then error "partition sizes do not match with the length of the list";
     if any(theList, theElt -> theElt === null) then error "filling must not contain null entries";
@@ -74,6 +73,23 @@ trim Partition := Partition => o -> lam -> (
     new Partition from lamShortened
     )
 trim (Partition,Partition) := (Partition,Partition) => o -> (lam,mu) -> (trim lam, trim mu)
+
+-*
+truncate Partition := theInput -> (
+    lam := theInput#1;
+    numTrailingZeros := # for i from 1 to #lam list (if lam#-i == 0 then 1 else break);
+
+    lamShortened := (toList lam)_(toList(0..(#lam-1-numTrailingZeros)));
+
+    new Partition from lamShortened
+    )
+
+truncate (Partition,Partition) := theInput -> (
+    (lam,mu) := theInput#1;
+
+    (truncate lam, truncate mu)
+    )
+*-
 
 pad (Partition,Partition) := (lam,mu) -> (
     maxLength := max(#lam,#mu);
@@ -242,6 +258,7 @@ toPosition (Partition, Partition, ZZ) := memoize( (lam,mu,theIndex) -> (
 toPosition (Sequence,ZZ) := (skewShape,theIndex) -> toPosition(skewShape#0,skewShape#1,theIndex)
 toPosition (Partition,ZZ) := (lam,theIndex) -> toPosition(lam,new Partition from {0},theIndex)
 toPosition (YoungTableau,ZZ) := (T,theIndex) -> toPosition(skewShape T, theIndex)
+toPosition (ZZ,YoungTableau) := (theIndex,T) -> toPosition(T,theIndex)
 
 positionList = method(TypicalValue => List)
 positionList (Partition,Partition) := memoize( (lam,mu) -> (
@@ -283,6 +300,7 @@ toIndex (Partition,Partition,Sequence) := memoize( (lam,mu,thePosition) -> (
 toIndex (Sequence,Sequence) := memoize((skewShape,thePosition) -> toIndex(skewShape#0,skewShape#1,thePosition))
 toIndex (Partition,Sequence) := memoize((lam,thePosition) -> toIndex(lam,new Partition from {0},thePosition))
 toIndex (YoungTableau,Sequence) := memoize((T,thePosition) -> toIndex(skewShape T,thePosition))
+toIndex (Sequence,YoungTableau) := (thePosition,T) -> toIndex(T,thePosition)
 
 -- drawing
 
