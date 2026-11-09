@@ -10,6 +10,17 @@ Node
       This package provides the classes @TO YoungTableau@, @TO MutableYoungTableau@, and @TO Tabloid@. These classes
       can be used to construct (skew) tableaux, and entries in the boxes may be any class. See the constructor's
       page @TO youngTableau@ for some basics of this class.
+    Example
+      lam = new Partition from {4,3,2}
+      mu = new Partition from {3,1}
+      T = youngTableau(lam, mu, {1,2,3,3,9})
+      allStandardTableaux(new Partition from {2,1})
+  SeeAlso
+    youngTableau
+    mutableYoungTableau
+    tabloid
+    allStandardTableaux
+    allSemistandardTableaux
 ///
 
 doc ///
@@ -902,22 +913,14 @@ SeeAlso
 doc ///
 Key
     positionList
-   (positionList, Partition, Partition)
-   (positionList, Partition)
    (positionList, YoungTableau)
    (positionList, YoungTableau, Function)
 Headline
    get the positions of all the boxes in a tableau
 Usage
-   positionList(lam,mu)
-   positionList lam
    positionList T
    positionList(T,f)
 Inputs
-    lam:Partition
-      the outer shape $\lambda$.
-    mu:Partition
-      the inner shape $\mu$. If not given, then it is assumed to be the $0$ partition.
     T:YoungTableau
       a tableau.
     f:Function
@@ -1346,22 +1349,16 @@ SeeAlso
 doc ///
 Key
     toIndex
-   (toIndex, Partition, Partition, Sequence)
-   (toIndex, Sequence, Sequence)
-   (toIndex, Partition, Sequence)
    (toIndex, YoungTableau, Sequence)
+   (toIndex, Sequence, YoungTableau)
 Headline
    get the index of a box, given its position
 Usage
-   toIndex(lam,mu,(i,j))
-   toIndex((lam,mu),(i,j))
-   toIndex(lam,(i,j))
+   toIndex(T,seq)
    toIndex(T,(i,j))
+   toIndex(seq,T)
+   toIndex((i,j),T)
 Inputs
-    lam:Partition
-      the outer shape $\lambda$.
-    mu:Partition
-      the inner shape $\mu$. If not given, then it is assumed to be the $0$ partition.
     T:YoungTableau
       a tableau.
     seq:Sequence
@@ -1396,22 +1393,14 @@ SeeAlso
 doc ///
 Key
     toPosition
-   (toPosition, Partition, Partition, ZZ)
-   (toPosition, Sequence, ZZ)
-   (toPosition, Partition, ZZ)
    (toPosition, YoungTableau, ZZ)
+   (toPosition, ZZ, YoungTableau)
 Headline
    get the position of a box, given its index
 Usage
-   toPosition(lam,mu,k)
-   toPosition((lam,mu),k)
-   toPosition(lam,k)
    toPosition(T,k)
+   toPosition(k,T)
 Inputs
-    lam:Partition
-      the outer shape $\lambda$.
-    mu:Partition
-      the inner shape $\mu$. If not given, then it is assumed to be the $0$ partition.
     T:YoungTableau
       a tableau.
     k:ZZ
