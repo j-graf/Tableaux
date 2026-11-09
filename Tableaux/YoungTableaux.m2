@@ -214,10 +214,10 @@ columnEntries (ZZ,YoungTableau) := (colIndex,T) -> delete(null,T_colIndex)
 columnEntries (YoungTableau,ZZ) := (T,colIndex) -> columnEntries(colIndex,T)
 
 rowList = method(TypicalValue => List)
-rowList YoungTableau := T -> for i from 0 to numRows T - 1 list rowEntries(T,i)
+rowList YoungTableau := T -> for i in rowRange T list rowEntries(T,i)
 
 columnList = method(TypicalValue => List)
-columnList YoungTableau := T -> for i from 0 to numColumns T - 1 list columnEntries(T,i)
+columnList YoungTableau := T -> for i in columnRange T list columnEntries(T,i)
 
 -- data indexing
 
@@ -685,9 +685,9 @@ isNatural YoungTableau := T -> sort entries T == toList(1..(size T))
 
 isColumnStrict = method(TypicalValue => Boolean)
 isColumnStrict YoungTableau := T -> (
-    isWeakRows := all(0..(numRows T - 1), i -> isSorted rowEntries(T,i));
-    isWeakCols := all(0..(numColumns T - 1), j -> isSorted columnEntries(T,j));
-    isUniqueCols := all(0..(numColumns T - 1), j -> max values tally columnEntries(T,j) == 1);
+    isWeakRows := all(rowRange T, i -> isSorted rowEntries(T,i));
+    isWeakCols := all(columnRange T, j -> isSorted columnEntries(T,j));
+    isUniqueCols := all(columnRange T, j -> max values tally columnEntries(T,j) == 1);
 
     isWeakRows and isWeakCols and isUniqueCols
     )
@@ -703,7 +703,7 @@ isRowStrict YoungTableau := T -> (
 
 isSemistandard = method(TypicalValue => Boolean)
 isSemistandard YoungTableau := T -> (
-    isColumnStrict T and isNonnegative T and isWeaklyDecreasing T
+    isColumnStrict T and isWeaklyDecreasing T
     )
 
 isStandard = method(TypicalValue => Boolean)
